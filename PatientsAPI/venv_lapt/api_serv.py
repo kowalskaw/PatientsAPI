@@ -1,44 +1,39 @@
 from flask import Flask, Blueprint
 from flask_restplus import Api, Resource, fields
 from marshmallow import Schema, fields as ma_fields, post_load
+from patient import Patient_obj, PatientSchema
 
 app = Flask(__name__)
 blueprint = Blueprint('api', __name__, url_prefix='/api')
-api = Api(blueprint, doc='/docs')
+
+authorizations = {
+    'apikey' : {
+        'type' : 'apiKey',
+        'in' : 'header',
+        'name' : 'X-API-KEY'
+    }
+}
+
+api = Api(blueprint, doc='/docs', authorizations=authorizations)
 
 app.register_blueprint(blueprint)
 
-
-class Patient_obj(object):
-    def __init__(self, patient_id, name):
-        self.patient_id = patient_id
-        self.name = name
-
-    def __repr__(self):
-        return 'Patient with ID {} and name {}.'.format(self.patient_id, self.name)
-
-
-class PatientSchema(Schema):
-    patient_id = ma_fields.Integer()
-    name = ma_fields.String()
-
-    @post_load
-    def create_patient(self, data):
-        return Patient_obj(**data)
+#def token_required()
 
 
 a_patient = api.model('Patient', {'patient_id': fields.Integer('Patients ID.'),
                                   'name': fields.String('Patients name.')})
 
 patients = []
-patient1 = Patient_obj(name = 'Werka', patient_id=1)
-patient2 = Patient_obj(name = 'Marcel', patient_id=2)
+patient1 = Patient_obj(name='Werka', patient_id=1)
+patient2 = Patient_obj(name='Marcel', patient_id=2)
 patients.append(patient1)
 patients.append(patient2)
 
 
 @api.route('/patients')
 class Patients(Resource):
+    @api.doc(security='apikey') # requires authorization
     def get(self):
         schema = PatientSchema(many=True)  # bc it's passing a list of objects
         return schema.dump(patients)
@@ -48,7 +43,7 @@ class Patients(Resource):
         schema = PatientSchema()
 
         new_patient = schema.load(api.payload)
-        #new_patient['id'] = len(patients)
+        # new_patient['id'] = len(patients)
         patients.append(new_patient.data)
         return {'result': 'Patient added'}, 201  # for sth has been created
 
