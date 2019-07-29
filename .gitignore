@@ -121,3 +121,15 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+*.xml
+*.iml
+*.cfg
+PatientsAPI/venv_lapt/Scripts/activate
+*.bat
+*.ps1
+*.exe
+PatientsAPI/venv_lapt/Scripts/easy_install-3.7-script.py
+PatientsAPI/venv_lapt/Scripts/easy_install-script.py
+PatientsAPI/venv_lapt/Scripts/pip-script.py
+PatientsAPI/venv_lapt/Scripts/pip3-script.py
+PatientsAPI/venv_lapt/Scripts/pip3.7-script.py
